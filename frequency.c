@@ -151,7 +151,7 @@ void preprocess(Text *text)
   char previous = '\0';
   char current  = '\0';
   char next = text->data[0];  /* Next is the first charcter as we go into the loop */
-  for (char_index = 0ul; char_index < text->length; ++char_index)
+  for (char_index = 0; char_index < text->length; ++char_index)
   {
     previous = current;
     current = next;
@@ -171,57 +171,6 @@ void preprocess(Text *text)
   }
 }
 
-
-/*
-  Load  text.
-*/
-Text getText(const char *path)
-{
-  Text text;
-  FILE *in_file = NULL;
-  size_t bytes_read = 0;
-
-  /* reset. */
-  text.length       = 0;
-  text.data         = NULL;
-  text.current_word = NULL;
-
-  /* Open file. */
-  if (!(in_file = fopen(path, "rb")))
-  {
-    fprintf(stderr, "Couldn't open %s!", path);
-    exit(2);
-  }
-
-  /*allocate buffer,by text length. */
-  fseek(in_file, 0, SEEK_END);
-  text.length = ftell(in_file);
-  if ( !(text.data = calloc(text.length + 1, sizeof(*text.data))) )
-  {
-    fclose(in_file);
-    fprintf(stderr, "Couldn't allocate memory (%zd bytes)!",
-            sizeof(*text.data) * text.length + 1);
-    exit(3);
-  }
-
-  /* Read the text */
-  fseek(in_file, 0, SEEK_SET);
-  bytes_read = fread(text.data, 1, text.length, in_file);
-  fclose(in_file);
-
-  /* Check all the data has been readed. */
-  if (bytes_read != text.length)
-  {
-    if (text.data)
-      free(text.data);
-    fprintf(stderr, "Failed to read expected number of chars!\n");
-    exit(4);
-  }
-
-  /* reset the "current word" pointer to the start. */
-  text.current_word = text.data;
-  return text;
-}
 
 
 /*
@@ -280,26 +229,6 @@ void addWord(const char *word, trienode *root)
 
 
 
-/*
-  Add the contents of a text file to the word count.  
-*/
-trienode * countTextFile(const char *path)
-{
-  const char *word = NULL;   /* The current word */
-  Text text = getText(path);
-  
-  preprocess(&text);
-  trienode *count_tree = calloc(1, sizeof(trienode));
-  
-  while ((word = getNextWord(&text)) != NULL){ addWord(word, count_tree);
-} 
-  freeText(&text);
-
-  return count_tree;
-}
-
-
-
 
 /*
   Print word counts to stream, defaulting to stdout.
@@ -351,21 +280,62 @@ void freeTree(trienode *root)
 }
 
 
+char *inputString(FILE* fp, size_t size){
+//The size is extended by the input with the value of the provisional
+    char *str;
+    int ch;
+    size_t len = 0;
+    str = realloc(NULL, sizeof(char)*size);//size is start size
+    if(!str)return str;
+    while(EOF!=(ch=fgetc(fp))){
+        str[len++]=ch;
+        if(len==size){
+            str = realloc(str, sizeof(char)*(size+=16));
+            if(!str)return str;
+        }
+    }
+    str[len++]='\0';
 
-int main(int argc,char const *argv[])
-{
- 
 
-if(argv[1][0]=='r'){
-trienode *counts_root = countTextFile(argv[2]);
-  printCountsDown(stdout, counts_root);
- freeTree(counts_root);
-}else{
- trienode *counts_root = countTextFile(argv[1]);
- printCounts(stdout, counts_root);
- freeTree(counts_root);
+    return realloc(str, sizeof(char)*len);
 }
-  return 0;
-}
+
+	int main(int argc,char const *argv[])
+	{
+
+		 char *m;
+
+    
+    m = inputString(stdin, 10);
+
+const char *word = NULL;   /* The current word */
+  Text text ;
+ 	text.current_word = m;
+  	text.data = m;
+  	text.length = strlen(m);
+    preprocess(&text);										
+  
+  trienode *count_tree = calloc(1, sizeof(trienode));
+	 while ((word = getNextWord(&text)) != NULL){ 			
+
+		addWord(word, count_tree);
+} 
+  
+
+		if(argc>=2){
+	if(argv[1][0]=='r'){
+	
+	  printCountsDown(stdout, count_tree);
+	 freeTree(count_tree);
+	}
+	}else{
+	 printCounts(stdout, count_tree);
+	 freeTree(count_tree);
+	}
+	freeText(&text);
+	//free(m);
+
+	  return 0;
+	}
 
 
