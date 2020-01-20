@@ -12,4 +12,4 @@ The main idea of the code is using a data structure in order to count occurences
 5) Type   valgrind./frequency <input.txt         for counting the frequncy according to alephbetical order from a to z, as well as checking if all the allocations were freed.
 6) Type   valgrind./frequency r <input.txt         for counting the frequncy according to alephbetical order from z to a, as well as checking if all the allocations were freed.
 
-![alt text]http://homes.sice.indiana.edu/yye/c343-2019/img/alphabettrie.png
+![alt text](http://homes.sice.indiana.edu/yye/c343-2019/img/alphabettrie.png)
