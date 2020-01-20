@@ -24,73 +24,6 @@ const int n_chars = N_CHARS;
 const char characters[N_CHARS] = "abcdefghijklmnopqrstuvwxyz\'";
 
 
-
-/*
-  recursive funtion printing unempty  words .
-*/
-void printNode(FILE *stream, const trienode *node, char c, int depth)
-{
-  /* contains string we build in deep search on tree */
-  static char stack[64];
-
-  /* put this char in stack. */
-  stack[depth] = c;
-
-  /* If there are changes  print the String and number of ocurrences */
-  if (node->count)
-    printf("%s\t%d\n", stack, node->count);
-
-  /* run over the other characters and call recursive function we need so. */
-  int i;
-  for (i = 0; i < n_chars; ++i)
-  {
-    if (node->children[i] != NULL)
-      printNode(stream, node->children[i], characters[i], depth+1);
-  }
-  stack[depth] = '\0';
-}
-
-
-/*
-  recursive funtion printing unempty  words from the end .
-*/
-void printNodeDown(FILE *stream, const trienode *node, char c, int depth)
-{
-  /* contains string we build in deep search on tree */
-  static char stack[64];
-
-  /* put this char in stack. */
-  stack[depth] = c;
-
-  /* If there are changes  print the String and number of ocurrences */
-  if (node->count)
-    printf("%s\t%d\n", stack, node->count);
-
-  /* run over the other characters and call recursive function we need so. */
-  int i;
-  for (i = n_chars-1; i >= 0; --i)
-  {
-    if (node->children[i] != NULL )
-      printNodeDown(stream, node->children[i], characters[i], depth+1);
-  }
-  stack[depth] = '\0';
-}
-
-
-/*
-  free the memory allocced to  input  .
-*/
-void freeText(Text *text)
-{
-  if (text->data)
-  {
-    free(text->data);
-    text->data = NULL;
-    text->current_word = NULL;
-    text->length = 0;
-  }
-}
-
 /*
     next word pointer .
 */
@@ -227,7 +160,59 @@ void addWord(const char *word, trienode *root)
 
 
 
+/////////////////printers
 
+
+/*
+  recursive funtion printing unempty  words .
+*/
+void printNode(FILE *stream, const trienode *node, char c, int depth)
+{
+  /* contains string we build in deep search on tree */
+  static char stack[64];
+
+  /* put this char in stack. */
+  stack[depth] = c;
+
+  /* If there are changes  print the String and number of ocurrences */
+  if (node->count)
+    printf("%s\t%d\n", stack, node->count);
+
+  /* run over the other characters and call recursive function we need so. */
+  int i;
+  for (i = 0; i < n_chars; ++i)
+  {
+    if (node->children[i] != NULL)
+      printNode(stream, node->children[i], characters[i], depth+1);
+  }
+  stack[depth] = '\0';
+}
+
+
+/*
+  recursive funtion printing unempty  words from the end .
+*/
+void printNodeDown(FILE *stream, const trienode *node, char c, int depth)
+{
+  /* contains string we build in deep search on tree */
+  static char stack[64];
+
+  /* put this char in stack. */
+  stack[depth] = c;
+
+  /* If there are changes  print the String and number of ocurrences */
+  if (node->count)
+    printf("%s\t%d\n", stack, node->count);
+
+  /* run over the other characters and call recursive function we need so. */
+  int i;
+  for (i = n_chars-1; i >= 0; --i)
+  {
+    if (node->children[i] != NULL )
+      printNodeDown(stream, node->children[i], characters[i], depth+1);
+  }
+  stack[depth] = '\0';
+}
 
 
 /*
@@ -261,6 +246,21 @@ void printCountsDown(FILE *stream, trienode *root)
   }
 }
 
+//////////////////free allocat
+
+/*
+  free the memory allocced to  input  .
+*/
+void freeText(Text *text)
+{
+  if (text->data)
+  {
+    free(text->data);
+    text->data = NULL;
+    text->current_word = NULL;
+    text->length = 0;
+  }
+}
 
 /*
   De-allocate a tree or subtree.
@@ -300,6 +300,8 @@ char *inputString(FILE* fp, size_t size){
     return realloc(str, sizeof(char)*len);
 }
 
+
+//////////////////main
 	int main(int argc,char const *argv[])
 	{
 
