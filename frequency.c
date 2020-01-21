@@ -4,8 +4,8 @@
 #define N_CHARS 27
 
 
-//////structors:
-typedef struct Text
+/////////////////////////structors:
+typedef struct input
 {
   unsigned long length;///len of text
   char *data;///pointer to start of text
@@ -75,7 +75,7 @@ _Bool isAlpha(char c)
 }
 
 /*
-   ru on text and Lower text and replace illegal characters with \0s, creating an array of
+   run on text and Lower text and replace illegal characters with \0s, creating an array of
   words which are null terminated by one or more null bytes.
 */
 void preprocess(Text *text)
@@ -160,8 +160,8 @@ void addWord(const char *word, trienode *root)
 
 
 
-/////////////////printers
 
+////////////////////printers
 
 /*
   recursive funtion printing unempty  words .
@@ -215,6 +215,7 @@ void printNodeDown(FILE *stream, const trienode *node, char c, int depth)
 }
 
 
+
 /*
   Print word counts to stream, defaulting to stdout.
 */
@@ -246,8 +247,7 @@ void printCountsDown(FILE *stream, trienode *root)
   }
 }
 
-//////////////////free allocat
-
+/////////////////////free memory 
 /*
   free the memory allocced to  input  .
 */
@@ -295,19 +295,21 @@ char *inputString(FILE* fp, size_t size){
         }
     }
     str[len++]='\0';
-
-
     return realloc(str, sizeof(char)*len);
 }
 
 
-//////////////////main
+
+//////////////////////////////main
 	int main(int argc,char const *argv[])
 	{
 
 		 char *m;
 
     
+/*
+  Intercept the string input from terminal.
+*/
     m = inputString(stdin, 10);
 
 const char *word = NULL;   /* The current word */
@@ -315,27 +317,63 @@ const char *word = NULL;   /* The current word */
  	text.current_word = m;
   	text.data = m;
   	text.length = strlen(m);
-    preprocess(&text);										
+
+/*
+  Turn char to downcase as well as terminate illegal chars.
+*/   
+ preprocess(&text);										
   
+/*
+  Create the trie.
+*/
   trienode *count_tree = calloc(1, sizeof(trienode));
 	 while ((word = getNextWord(&text)) != NULL){ 			
 
+/*
+  Add words to the tree
+*/
 		addWord(word, count_tree);
 } 
   
 
+/*
+  If there is more than one argument in terminal input and the letter r is inserted before reading the file
+*/
 		if(argc>=2){
 	if(argv[1][0]=='r'){
 	
+/*
+  Print from Z to A
+*/
 	  printCountsDown(stdout, count_tree);
+
+/*
+  Free tree allocations.
+*/
 	 freeTree(count_tree);
 	}
+
+/*
+  Only one argument from terminal input.
+*/
 	}else{
+
+/*
+  Print from A to Z.
+*/
 	 printCounts(stdout, count_tree);
+
+/*
+  Free tree allocations.
+*/
 	 freeTree(count_tree);
 	}
+
+/*
+  Free text allocations.
+*/
 	freeText(&text);
-	//free(m);
+	
 
 	  return 0;
 	}
